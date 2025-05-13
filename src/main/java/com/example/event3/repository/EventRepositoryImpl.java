@@ -36,4 +36,11 @@ public class EventRepositoryImpl implements EventRepository{
     public Event findEventById(Long id) {
         return eventList.get(id);
     }
+
+//    public Event Verification(Long id){
+//        Event event = eventList.get(id);
+//        Long pw = event.getPw();
+//        return null;
+//    }
+
 }

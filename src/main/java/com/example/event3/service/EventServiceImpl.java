@@ -65,4 +65,18 @@ public class EventServiceImpl implements EventService{
         }
         return new PostResponseEventDto(event);
     }
+
+    @Override
+    public PostResponseEventDto updateEvnet(Long id, String title, String thingsToDo) {
+        Event event = eventRepository.findEventById(id);
+
+        if ( event == null ){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"식별아이디에 값이 존재하지 않습니다");
+        }
+        if ( title == null || thingsToDo == null ){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목 혹은 할일의 값이 비어있습니다.");
+        }
+        event.updateEvent(title, thingsToDo);
+        return new PostResponseEventDto(event);
+    }
 }

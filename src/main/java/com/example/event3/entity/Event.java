@@ -35,5 +35,9 @@ public class Event {
         this.createDate = time;
         this.modifyDate = time;
     }
+    public void updateEvent ( String title, String thingsToDo){
+        this.title = title;
+        this.thingsToDo = thingsToDo;
+    }
 
 }
