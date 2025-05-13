@@ -11,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventService{
@@ -28,13 +27,12 @@ public class EventServiceImpl implements EventService{
 
     @Override
     public PostResponseEventDto createEventService( PostRequestEventDto dto ) {
-        Event event = new Event( dto.getTitle(), dto.getThingsToDo(), dto.getName(), dto.getPw() );
+        Event event = new Event( dto.getTitle(), dto.getContent(), dto.getName(), dto.getPw() );
 
         LocalDateTime date = LocalDateTime.now();
         event.setCreateAndModifyDate(date);
 
-        Event savedEvent = eventRepository.saveEvent( event );
-        return new PostResponseEventDto(savedEvent);
+        return eventRepository.saveEvent(event);
     }
 
     @Override//모든 일정 조회
