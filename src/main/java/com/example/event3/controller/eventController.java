@@ -38,4 +38,9 @@ public class eventController {
             ) {
         return new ResponseEntity<>( eventService.checkFiltering( name, modifyDate ),HttpStatus.OK);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<PostResponseEventDto> checkEventbyId(@PathVariable Long id){
+
+        return new ResponseEntity<>(eventService.findEventById(id), HttpStatus.OK);
+    }
 }

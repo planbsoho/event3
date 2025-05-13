@@ -4,7 +4,9 @@ import com.example.event3.dto.PostRequestEventDto;
 import com.example.event3.dto.PostResponseEventDto;
 import com.example.event3.entity.Event;
 import com.example.event3.repository.EventRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -55,4 +57,12 @@ public class EventServiceImpl implements EventService{
         return filteringList;
     }
 
+    @Override
+    public PostResponseEventDto findEventById(Long id) {
+        Event event = eventRepository.findEventById(id);
+        if ( event == null ){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"id 가" + id + "인 일정을 찾지못했습니다");
+        }
+        return new PostResponseEventDto(event);
+    }
 }

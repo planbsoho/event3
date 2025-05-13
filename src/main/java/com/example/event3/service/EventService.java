@@ -11,4 +11,5 @@ public interface EventService {
     PostResponseEventDto createEventService( PostRequestEventDto dto );
     List<PostResponseEventDto> checkAllEvents();
     List<PostResponseEventDto> checkFiltering(String name, LocalDateTime mdifyDate);
+    PostResponseEventDto findEventById(Long id);
 }

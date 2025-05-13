@@ -8,4 +8,5 @@ import java.util.List;
 public interface EventRepository {
     Event saveEvent(Event event);
     List<PostResponseEventDto> findAllEvents();
+    Event findEventById(Long id);
 }

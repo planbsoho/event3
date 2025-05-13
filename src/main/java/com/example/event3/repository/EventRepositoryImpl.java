@@ -31,4 +31,9 @@ public class EventRepositoryImpl implements EventRepository{
         }
         return allEvents;
     }
+
+    @Override
+    public Event findEventById(Long id) {
+        return eventList.get(id);
+    }
 }
