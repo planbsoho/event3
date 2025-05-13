@@ -4,6 +4,7 @@ import com.example.event3.dto.PostRequestEventDto;
 import com.example.event3.dto.PostResponseEventDto;
 import com.example.event3.dto.PutRequestEventDtd;
 import com.example.event3.service.EventService;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,5 +57,20 @@ public class eventController {
             @RequestBody PutRequestEventDtd dto
     ) {
         return new ResponseEntity<>(eventService.updateEvnet(id, dto.getTitle(), dto.getThingsToDo()), HttpStatus.OK);
+    }
+
+    //id로 내용만 수정하기
+    @PatchMapping("/{id}")
+    public ResponseEntity<PostResponseEventDto> updateThingsTo(
+            @PathVariable Long id,
+            @RequestBody PutRequestEventDtd dto
+    ) {
+        return new ResponseEntity<>(eventService.updateEvnet(id, dto.getTitle(), dto.getThingsToDo()), HttpStatus.OK);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id){
+        eventService.deleteEvent(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

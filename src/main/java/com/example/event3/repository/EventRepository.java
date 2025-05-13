@@ -9,4 +9,5 @@ public interface EventRepository {
     Event saveEvent(Event event);
     List<PostResponseEventDto> findAllEvents();
     Event findEventById(Long id);
+    void deleteEvent(Long id);
 }

@@ -17,4 +17,9 @@ public interface EventService {
     PostResponseEventDto findEventById(Long id);
 
     PostResponseEventDto updateEvnet(Long id, String title, String thingsToDo);
+
+    PostResponseEventDto updateThingsTo(Long id, String title, String thingsToDo);
+
+    void deleteEvent(Long id);
+
 }

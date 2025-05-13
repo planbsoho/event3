@@ -35,8 +35,13 @@ public class Event {
         this.createDate = time;
         this.modifyDate = time;
     }
+    //이름과 할일수정
     public void updateEvent ( String title, String thingsToDo){
         this.title = title;
+        this.thingsToDo = thingsToDo;
+    }
+    //할일만 수정
+    public void updateThingsToDo( String thingsToDo){
         this.thingsToDo = thingsToDo;
     }
 
