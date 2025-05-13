@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @RestController
 @RequestMapping("/events")
 public class eventController {
@@ -18,8 +21,21 @@ public class eventController {
     }
 
     @PostMapping
-    public ResponseEntity<PostResponseEventDto> createEvent(@RequestBody PostRequestEventDto dto){
+    public ResponseEntity<PostResponseEventDto> createEvent( @RequestBody PostRequestEventDto dto ) {
 
-        return new ResponseEntity<>(eventService.createEventService(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>( eventService.createEventService(dto), HttpStatus.CREATED );
+    }
+    //이벤트 전체조회 는 PostResponseEventDto와 동일한정보이므로 기존dto그대로사용
+    @GetMapping
+    public ResponseEntity<List<PostResponseEventDto>> checkAllEvent() {
+
+        return new ResponseEntity<>( eventService.checkAllEvents(), HttpStatus.OK );
+    }
+    @GetMapping("/filter")//이름으로 조회
+    public ResponseEntity<List<PostResponseEventDto>> checkFiltering(
+            @RequestParam( required = true ) String name,
+            @RequestParam( required = false )LocalDateTime modifyDate
+            ) {
+        return new ResponseEntity<>( eventService.checkFiltering( name, modifyDate ),HttpStatus.OK);
     }
 }

@@ -1,11 +1,10 @@
 package com.example.event3.repository;
 
+import com.example.event3.dto.PostResponseEventDto;
 import com.example.event3.entity.Event;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Repository
 public class EventRepositoryImpl implements EventRepository{
@@ -20,5 +19,16 @@ public class EventRepositoryImpl implements EventRepository{
 
         eventList.put(eventId, event);
         return event;
+    }
+
+    @Override//새로운 리스트에 모든이벤트를 담아서 전달
+    public List<PostResponseEventDto> findAllEvents() {
+        List<PostResponseEventDto> allEvents = new ArrayList<>();
+
+        for ( Event event : eventList.values() ) {
+            PostResponseEventDto dto = new PostResponseEventDto(event);
+            allEvents.add(dto);
+        }
+        return allEvents;
     }
 }
