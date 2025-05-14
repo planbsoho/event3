@@ -1,33 +1,31 @@
 package com.example.event3.service;
 
-import com.example.event3.dto.PostRequestEventDto;
-import com.example.event3.dto.PostResponseEventDto;
+import com.example.event3.dto.RequestEventDto;
+import com.example.event3.dto.ResponseEventDto;
 import com.example.event3.entity.Event;
 import com.example.event3.repository.EventRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EventServiceImpl implements EventService{
 
     private final EventRepository eventRepository;
 
-//    public EventService (EventRepository eventRepository){
-//        this.eventRepository = eventRepository;
-//    }  선언은 인터페이스 구현은 임플?
-
     public EventServiceImpl( EventRepository eventRepository ) {
         this.eventRepository = eventRepository;
     }
 
     @Override
-    public PostResponseEventDto createEventService( PostRequestEventDto dto ) {
-        Event event = new Event( dto.getTitle(), dto.getContent(), dto.getName(), dto.getPw() );
+    public ResponseEventDto createEventService( RequestEventDto dto ) {
+        Event event = new Event( dto.getTitle(), dto.getContent(), dto.getName(), dto.getPw());
 
         LocalDateTime date = LocalDateTime.now();
         event.setCreateAndModifyDate(date);
@@ -36,70 +34,73 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override//모든 일정 조회
-    public List<PostResponseEventDto> checkAllEvents() {
-
+    public List<ResponseEventDto> checkAllEvents() {
         return eventRepository.findAllEvents();
     }
 
     @Override//dto에서 이름을 불러와 이름이 동일할때만 리스트에 담아서 전달
-    public List<PostResponseEventDto> checkFiltering(String name, LocalDateTime mdifyDate) {
+    public List<ResponseEventDto> checkFiltering( String name, LocalDateTime mdifyDate ) {
 
-        List<PostResponseEventDto> allEvents = eventRepository.findAllEvents();
-        List<PostResponseEventDto> filteringList = new ArrayList<>();
+        List<ResponseEventDto> allEvents = eventRepository.findAllEvents();
+        List<ResponseEventDto> filteringList = new ArrayList<>();
 
-        for ( PostResponseEventDto dto : allEvents ) {
+        for ( ResponseEventDto dto : allEvents ) {
             if( name.equals( dto.getName() ) ) {
-                filteringList.add(dto);
+                filteringList.add( dto );
             }
         }
         return filteringList;
     }
 
     @Override
-    public PostResponseEventDto findEventById(Long id) {
-        Event event = eventRepository.findEventById(id);
-        if ( event == null ){
+    public ResponseEventDto findEventById( Long id ) {
+        Optional<Event> optionalEvent = eventRepository.findEventById(id);
+        if (optionalEvent.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"id 가" + id + "인 일정을 찾지못했습니다");
         }
-        return new PostResponseEventDto(event);
+        return new ResponseEventDto(optionalEvent.get());
     }
 
+    @Transactional
     @Override
-    public PostResponseEventDto updateEvnet(Long id, String title, String thingsToDo) {
-        Event event = eventRepository.findEventById(id);
-
-        if ( event == null ){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"식별아이디에 값이 존재하지 않습니다");
-        }
-        if ( title == null || thingsToDo == null ){
+    public ResponseEventDto updateEvent( Long id, String title, String content ) {
+        if ( title == null || content == null ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목 혹은 할일의 값이 비어있습니다.");
         }
-        event.updateEvent(title, thingsToDo);
-        return new PostResponseEventDto(event);
+        int updatedRow = eventRepository.update(id, title, content);
+
+        if ( updatedRow == 0 ){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"no data");
+        }
+
+        Optional<Event> optionalEvent = eventRepository.findEventById(id);
+
+        return new ResponseEventDto(optionalEvent.get());
     }
 
     @Override
-    public PostResponseEventDto updateThingsTo(Long id, String title, String thingsToDo) {
-        Event event = eventRepository.findEventById(id);
+    public void deleteEvent( Long id ) {
 
-        if ( event == null ){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"식별아이디에 값이 존재하지 않습니다");
-        }
-        if ( title != null || thingsToDo == null ){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목 혹은 할일의 값이 비어있습니다.");
-        }
-        event.updateThingsToDo(thingsToDo);
+        int deleteRow = eventRepository.deleteEvent(id);
 
-        return new PostResponseEventDto(event);
+        if( deleteRow == 0 ){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제할 이벤트가 없습니다");
+        }
     }
 
     @Override
-    public void deleteEvent(Long id) {
-        Event event = eventRepository.findEventById(id);
+    public ResponseEventDto updateTitle( Long id, String title ) {
 
-        if ( event == null ){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"식별아이디에 값이 존재하지 않습니다");
+        if ( title == null ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 요청입니다");
         }
-        eventRepository.deleteEvent(id);
+        int updateRow = eventRepository.updateTitle(id, title);
+
+        if ( updateRow == 0 ){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"찾을수 없습니다.");
+        }
+        Optional<Event> optionalEvent = eventRepository.findEventById(id);
+
+        return new ResponseEventDto( optionalEvent.get() );
     }
 }

@@ -1,16 +1,23 @@
 package com.example.event3.repository;
 
-import com.example.event3.dto.PostResponseEventDto;
+import com.example.event3.dto.ResponseEventDto;
 import com.example.event3.entity.Event;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EventRepository {
-    PostResponseEventDto saveEvent(Event event);
+    ResponseEventDto saveEvent( Event event );
 
-    List<PostResponseEventDto> findAllEvents();
+    List<ResponseEventDto> findAllEvents();
 
-    Event findEventById(Long id);
+    Optional<Event> findEventById( Long id );
 
-    void deleteEvent(Long id);
+    int update( Long id, String title, String contents );
+
+    int updateTitle( Long id, String Title );
+
+    int deleteEvent( long id );
+
+    Event findEventByIdOrElseThrow( Long id );
 }

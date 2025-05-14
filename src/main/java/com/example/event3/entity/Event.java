@@ -28,6 +28,13 @@ public class Event {
         this.name = name;
         this.pw = pw;
     }
+
+    public Event(long id, String title, String content) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+    }
+
     //메서드
     public void setCreateAndModifyDate(LocalDateTime time) {
         this.createDate = time;

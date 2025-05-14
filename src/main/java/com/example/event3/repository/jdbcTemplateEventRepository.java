@@ -1,15 +1,21 @@
 package com.example.event3.repository;
 
-import com.example.event3.dto.PostResponseEventDto;
+import com.example.event3.dto.ResponseEventDto;
 import com.example.event3.entity.Event;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 @Repository
@@ -17,44 +23,83 @@ public class jdbcTemplateEventRepository implements EventRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public jdbcTemplateEventRepository(DataSource dataSource) {
+    public jdbcTemplateEventRepository( DataSource dataSource ) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Override
-    public PostResponseEventDto saveEvent(Event event) {
+    public ResponseEventDto saveEvent( Event event ) {
 
-        //simplejdbcinsert = jdbc쿼리를 문자열로작성하지 않아도 된다.
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName("event").usingGeneratedKeyColumns("id");
-        //event테이블에 인서트하겠다.  이테이블의 키값은 id이다
+
 
         Map<String, Object> parameter = new TreeMap<>();
         parameter.put("title", event.getTitle());
         parameter.put("content", event.getContent());
-//        parameter.put("title", event.getTitle());
-//        parameter.put("thingsToDo", event.getThingsToDo());
-//        parameter.put("name", event.getName());
-//        parameter.put("create_date", event.getCreateDate());
-//        parameter.put("modify_date", event.getModifyDate());
+        parameter.put("name", event.getName());
+        parameter.put("pw", event.getPw());
 
-        //저장후 auto로 생성된 키값을 반환하는 메서드
-        Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameter));
-        return new PostResponseEventDto(key.longValue(), event.getTitle(), event.getContent());
+        Number key = jdbcInsert.executeAndReturnKey( new MapSqlParameterSource( parameter ));
+        return new ResponseEventDto( key.longValue(), event.getTitle(), event.getContent() );
     }
 
     @Override
-    public List<PostResponseEventDto> findAllEvents() {
-        return List.of();
+    public List<ResponseEventDto> findAllEvents() {
+        return jdbcTemplate.query("select * from event", eventRowMapper());
     }
 
     @Override
-    public Event findEventById(Long id) {
-        return null;
+    public Optional<Event> findEventById( Long id ) {
+        List<Event> result = jdbcTemplate.query("select * from event where id = ?", eventRowMapperV2(), id);
+        return result.stream().findAny();
+    }
+
+    private RowMapper<ResponseEventDto> eventRowMapper() {
+        return new RowMapper<ResponseEventDto>() {
+            @Override
+            public ResponseEventDto mapRow( ResultSet rs, int rowNum ) throws SQLException {
+                return new ResponseEventDto(
+                        rs.getLong("id"),
+                        rs.getString("title"),
+                        rs.getString("content")
+                );
+            }
+        };
+    }
+
+    private RowMapper<Event> eventRowMapperV2() {
+        return new RowMapper<Event>() {
+            @Override
+            public Event mapRow( ResultSet rs, int rowNum ) throws SQLException {
+                return new Event(
+                        rs.getLong("id"),
+                        rs.getString("title"),
+                        rs.getString("content")
+                );
+            }
+        };
     }
 
     @Override
-    public void deleteEvent(Long id) {
+    public int update( Long id, String title, String content ) {
+        return jdbcTemplate.update("update event set title = ?, content = ? where id = ?", title, content, id);
+    }
 
+    @Override
+    public int updateTitle( Long id, String title ) {
+        return jdbcTemplate.update("update event set title = ? where id = ?", title, id);
+    }
+
+    @Override
+    public int deleteEvent( long id ) {
+        return jdbcTemplate.update("delete from event where id = ?", id );
+    }
+
+    //반복되는 null검증을 메서드화 repostiory에서 객체검증. 은
+    @Override
+    public Event findEventByIdOrElseThrow( Long id ) {
+        List<Event> result = jdbcTemplate.query("select * from event by id = ?", eventRowMapperV2(), id);
+        return result.stream().findAny().orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND," Does not exist id = " + id));
     }
 }

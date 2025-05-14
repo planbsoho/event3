@@ -1,25 +1,25 @@
 package com.example.event3.service;
 
-import com.example.event3.dto.PostRequestEventDto;
-import com.example.event3.dto.PostResponseEventDto;
+import com.example.event3.dto.RequestEventDto;
+import com.example.event3.dto.ResponseEventDto;
+import com.example.event3.repository.EventRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.regex.PatternSyntaxException;
 
 public interface EventService {
-    PostResponseEventDto createEventService( PostRequestEventDto dto );
+    ResponseEventDto createEventService( RequestEventDto dto );
 
-    List<PostResponseEventDto> checkAllEvents();
+    List<ResponseEventDto> checkAllEvents();
 
-    List<PostResponseEventDto> checkFiltering(String name, LocalDateTime mdifyDate);
+    List<ResponseEventDto> checkFiltering( String name, LocalDateTime mdifyDate );
 
-    PostResponseEventDto findEventById(Long id);
+    ResponseEventDto findEventById( Long id );
 
-    PostResponseEventDto updateEvnet(Long id, String title, String thingsToDo);
+    ResponseEventDto updateEvent( Long id, String title, String content );
 
-    PostResponseEventDto updateThingsTo(Long id, String title, String thingsToDo);
+    void deleteEvent( Long id );
 
-    void deleteEvent(Long id);
+    ResponseEventDto updateTitle( Long id, String title );
 
 }
